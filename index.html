@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<!--
+╔══════════════════════════════════════════════════════════════════════╗
+║  PORTFÓLIO "MENU DE VIDEOGAME" — RAFAEL SIMÃO CARNEIRO (Rolfis)      ║
+║  Inspirado no menu de canais do Wii, com as cores do MathUni         ║
+║  (laranja + branco) e o cursor do jogo.                              ║
+║                                                                      ║
+║  COMO FUNCIONA                                                       ║
+║   • Tela de start → botão "Iniciar portfólio"                        ║
+║   • Menu em 3 linhas guiadas:                                        ║
+║       1 Quem sou eu · 2 Meus projetos · 3 Fale comigo                ║
+║   • Clique num canal → abre com zoom (estilo Wii)                    ║
+║   • Dentro do canal: ◀ ▶ trocam de canal · "Menu" ou Esc voltam      ║
+║                                                                      ║
+║  COMO EDITAR → Ctrl+F e procure:  ✏️ EDITE                            ║
+║    ✏️ EDITE [START]    → textos da tela inicial (HTML)                ║
+║    ✏️ EDITE [GRADE]    → os quadrados de cada linha (HTML)            ║
+║    ✏️ EDITE [CANAIS]   → texto, selo e botão de cada canal (JS)       ║
+║    ✏️ EDITE [CONTATOS] → links (JS)                                   ║
+║    ✏️ EDITE [SKILLS]   → habilidades (JS)                             ║
+║    ✏️ EDITE [MATHUNI]  → progresso e botão do MathUni (JS)            ║
+║    ✏️ EDITE [COR]      → laranja do MathUni (variáveis no :root)      ║
+║                                                                      ║
+║  PASTAS (envie tudo junto):                                          ║
+║    index.html                                                        ║
+║    img/      rafael.jpg · mathuni.jpg · mathfund.jpg ·               ║
+║              cifradog.jpg · cifradog-logo.png                        ║
+║    cursors/  arrow.png · pointer.png · hand.png  (cursores do jogo)  ║
+╚══════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rafael Simão Carneiro · Portfólio</title>
+<meta name="description" content="Portfólio de Rafael Simão Carneiro em forma de menu de videogame: jogos educativos web, sites e música.">
+<meta name="theme-color" content="#f2f3f4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   ✏️ EDITE [COR] — cores do MathUni + cinzas do menu do Wii
+   ================================================================ */
+:root{
+  --laranja:      #ff8705;   /* laranja do título do MathUni */
+  --laranja-esc:  #e56f00;
+  --laranja-claro:#ffb347;
+  --branco:       #ffffff;
+  --fundo:        #f2f3f4;
+  --linha:        #e7e9eb;
+  --borda:        #c8cdd1;
+  --cinza:        #8e979e;
+  --texto:        #3f474e;
+  --fonte: "M PLUS Rounded 1c","Segoe UI",system-ui,sans-serif;
+
+  --barra: 104px;            /* altura da barra de baixo (diminua para ela ocupar menos) */
+
+  /* Cursores do MathUni (arquivo + ponto exato do clique) */
+  --cursor:       url("cursors/arrow.png") 4 3, auto;
+  --cursor-clique:url("cursors/pointer.png") 6 3, pointer;
+  --cursor-mao:   url("cursors/hand.png") 16 4, pointer;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--fonte);color:var(--texto);
+  background:repeating-linear-gradient(180deg,var(--fundo) 0 3px,var(--linha) 3px 4px);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  cursor:var(--cursor);
+}
+button,a,[data-canal],.clicavel{cursor:var(--cursor-clique)}
+button:active,a:active,[data-canal]:active{cursor:var(--cursor-mao)}
+button{font:inherit;color:inherit;background:none;border:0}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:3px solid var(--laranja);outline-offset:3px}
+.so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ================================================================
+   BOTÕES ESTILO WII (retângulo arredondado branco, borda cinza)
+   ================================================================ */
+.btn-wii{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-width:220px;height:64px;padding:0 26px;border-radius:18px;
+  font-size:1.12rem;font-weight:800;color:var(--texto);
+  background:linear-gradient(#fff 0%,#fff 50%,#eef0f2 100%);
+  border:3px solid var(--borda);
+  box-shadow:0 4px 0 #d9dde0,0 8px 18px rgba(0,0,0,.08),inset 0 2px 0 #fff;
+  transition:border-color .2s,box-shadow .2s,transform .15s;
+}
+.btn-wii:hover,.btn-wii:focus-visible{border-color:var(--laranja);box-shadow:0 4px 0 #d9dde0,0 0 0 5px rgba(255,135,5,.25),0 10px 20px rgba(0,0,0,.1);outline:none}
+.btn-wii:active{transform:translateY(3px);box-shadow:0 1px 0 #d9dde0}
+.btn-wii.laranja{color:var(--laranja-esc)}
+.btn-wii[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.btn-wii svg{width:22px;height:22px;flex:none}
+
+/* ================================================================
+   ✏️ EDITE [START] · TELA DE START (estilo tela inicial do Wii)
+   ================================================================ */
+#inicio{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;overflow:hidden;
+  background:
+    radial-gradient(900px 520px at 50% -5%,rgba(255,135,5,.16),transparent 65%),
+    repeating-linear-gradient(180deg,#fff 0 3px,#f1f2f3 3px 4px);
+  transition:opacity .6s ease,transform .6s ease,visibility .6s;
+}
+#inicio.sumir{opacity:0;visibility:hidden;transform:scale(1.1)}
+.inicio-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.inicio-box>*{animation:sobe .7s cubic-bezier(.2,.9,.3,1.2) backwards}
+.inicio-box>*:nth-child(2){animation-delay:.12s}
+.inicio-box>*:nth-child(3){animation-delay:.22s}
+.inicio-box>*:nth-child(4){animation-delay:.34s}
+.inicio-box>*:nth-child(5){animation-delay:.5s}
+@keyframes sobe{from{opacity:0;transform:translateY(22px) scale(.96)}}
+
+.foto-inicio{position:relative;width:170px;height:170px;margin-bottom:8px}
+.foto-inicio img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;object-position:50% 25%;border-radius:50%;border:6px solid #fff;box-shadow:0 0 0 5px var(--laranja),0 14px 30px rgba(229,111,0,.3)}
+.foto-inicio::before,.foto-inicio::after{ /* ondas saindo da foto */
+  content:"";position:absolute;inset:-5px;border-radius:50%;border:3px solid var(--laranja);opacity:0;animation:onda 3.2s ease-out infinite;
+}
+.foto-inicio::after{animation-delay:1.6s}
+@keyframes onda{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
+
+.ola{font-size:clamp(1.05rem,2.6vw,1.35rem);color:var(--cinza);font-weight:700}
+.ola b{color:var(--texto)}
+.vamos{font-size:clamp(1.9rem,5.6vw,3.2rem);font-weight:900;line-height:1.08;letter-spacing:-.6px;max-width:15ch}
+.vamos span{color:var(--laranja)}
+
+.btn-start{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;
+  width:min(400px,86vw);height:84px;border-radius:24px;font-size:1.5rem;font-weight:900;color:var(--laranja-esc);
+  background:linear-gradient(#fff 0%,#fff 50%,#eef0f2 100%);border:5px solid var(--laranja);
+  box-shadow:0 6px 0 #d9dde0,0 0 0 0 rgba(255,135,5,.35),0 14px 28px rgba(229,111,0,.2);
+  animation:convite 2.2s ease-in-out infinite;transition:transform .15s;
+}
+.btn-start svg{width:30px;height:30px}
+.btn-start:hover,.btn-start:focus-visible{transform:scale(1.04);outline:none;border-color:var(--laranja-esc)}
+.btn-start:active{transform:translateY(4px);box-shadow:0 2px 0 #d9dde0}
+@keyframes convite{50%{box-shadow:0 6px 0 #d9dde0,0 0 0 12px rgba(255,135,5,.14),0 14px 28px rgba(229,111,0,.2)}}
+.btn-start .dedo{position:absolute;right:-30px;bottom:-26px;width:58px;height:58px;pointer-events:none;animation:apontar 1.2s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.2))}
+@keyframes apontar{50%{transform:translate(-5px,-6px)}}
+
+/* trilha: mostra de relance o que existe lá dentro (sem texto longo) */
+.trilha{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:26px}
+.passo-chip{display:flex;align-items:center;gap:9px;font-size:.92rem;font-weight:800;color:var(--texto);background:#fff;border:3px solid #e1e4e7;border-radius:999px;padding:6px 16px 6px 8px;box-shadow:0 3px 0 #e7e9eb}
+.passo-chip i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--laranja);color:#fff;font-style:normal;font-weight:900;font-size:.9rem}
+.passo-chip svg{width:18px;height:18px}
+.trilha .seta-t{color:var(--borda);font-size:1.3rem;font-weight:900}
+
+.onda-rodape{position:absolute;left:0;right:0;bottom:0;height:120px;width:100%;pointer-events:none}
+
+/* ================================================================
+   MENU PRINCIPAL
+   ================================================================ */
+#menu{min-height:100%;padding:18px 0 calc(var(--barra) + 26px);display:flex;flex-direction:column;align-items:center}
+.menu-topo{width:min(1180px,94%);margin:0 auto 10px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.marca{font-weight:900;font-size:1.05rem;color:var(--texto);letter-spacing:.2px}
+.marca span{color:var(--laranja)}
+.marca small{font-weight:500;color:var(--cinza);margin-left:6px}
+.dica-topo{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:var(--cinza);background:#fff;border:2px solid #e3e6e8;border-radius:999px;padding:4px 14px 4px 8px}
+.dica-topo img{width:24px;height:24px;animation:apontar 1.4s ease-in-out infinite}
+
+/* ---- Linhas guiadas ---- */
+/* A largura se ajusta à altura da tela para as 3 linhas caberem sem rolar */
+.fila{
+  width:min(1180px,94%,max(720px,calc((100vh - var(--barra) - 270px) * 8 / 3 + 56px)));
+  margin:0 auto 12px;
+}
+.fila-titulo{display:flex;align-items:center;gap:12px;margin:0 0 8px 4px}
+.fila-titulo .num{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-weight:900;color:#fff;background:radial-gradient(circle at 35% 30%,var(--laranja-claro),var(--laranja) 55%,var(--laranja-esc));
+  box-shadow:0 3px 8px rgba(229,111,0,.4);
+}
+.fila-titulo h2{font-size:1.08rem;line-height:1.1;letter-spacing:-.2px}
+.fila-titulo p{font-size:.8rem;color:var(--cinza);font-weight:700}
+.fila-titulo::after{content:"";flex:1;height:3px;border-radius:3px;background:linear-gradient(90deg,rgba(255,135,5,.55),transparent)}
+
+.grade{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.grade.tres{grid-template-columns:repeat(3,1fr);width:60%;margin:0 auto}
+.canal{
+  position:relative;display:block;width:100%;aspect-ratio:16/10;padding:0;
+  border-radius:22px;overflow:hidden;
+  background:#fafbfb;border:4px solid var(--borda);
+  box-shadow:0 6px 14px rgba(0,0,0,.08),inset 0 0 0 2px #fff;
+  transition:transform .25s cubic-bezier(.3,1.5,.5,1),border-color .2s,box-shadow .25s;
+  animation:entra-canal .55s cubic-bezier(.3,1.4,.5,1) backwards;
+  animation-play-state:paused;      /* começa quando a tela de start fecha */
+}
+body.pronto .canal{animation-play-state:running}
+@keyframes entra-canal{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.canal:hover,.canal:focus-visible{
+  transform:scale(1.05);border-color:var(--laranja);outline:none;z-index:2;
+  box-shadow:0 0 0 5px rgba(255,135,5,.28),0 14px 30px rgba(229,111,0,.25);
+}
+.canal::after{ /* brilho de vidro no topo, igual aos canais do Wii */
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0) 38%);
+}
+.rotulo{
+  position:absolute;left:9px;bottom:8px;z-index:1;font-size:.74rem;font-weight:800;color:var(--texto);
+  background:rgba(255,255,255,.92);border-radius:999px;padding:2px 10px;box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.adesivo{ /* selo "EM BREVE" no canto */
+  position:absolute;top:8px;right:8px;z-index:1;font-size:.62rem;font-weight:900;letter-spacing:1px;color:#fff;
+  background:linear-gradient(var(--laranja-claro),var(--laranja-esc));border:2px solid #fff;border-radius:999px;padding:1px 9px;
+  box-shadow:0 3px 8px rgba(229,111,0,.45);animation:pulsar 2s ease-in-out infinite;
+}
+@keyframes pulsar{50%{transform:scale(1.08)}}
+
+/* ================================================================
+   ARTES DOS CANAIS — só fotos reais e canais de texto (sem desenhos)
+   (cqw = % da largura do canal: a mesma arte serve pequena e grande)
+   ================================================================ */
+.arte{position:absolute;inset:0;display:block;container-type:inline-size;overflow:hidden}
+.arte img{width:100%;height:100%;object-fit:cover}
+.arte-foto img{object-position:50% 28%;animation:respira 9s ease-in-out infinite alternate}
+.arte-mathuni img{animation:passeio 14s ease-in-out infinite alternate}
+@keyframes respira{to{transform:scale(1.08)}}
+@keyframes passeio{from{transform:scale(1.08) translateX(-2%)}to{transform:scale(1.08) translateX(2%)}}
+.arte-cifra .logo{position:absolute;left:0;right:0;bottom:9%;margin:auto;width:62%;height:auto;filter:drop-shadow(0 3px 8px rgba(0,0,0,.7));animation:balanca 3s ease-in-out infinite}
+@keyframes balanca{50%{transform:rotate(-2deg) scale(1.03)}}
+
+/* Canal de texto branco (estilo "Internet Channel") */
+.arte-texto{display:grid;place-content:center;text-align:center;background:linear-gradient(#fff,#eef7ff 60%,#fff3e6)}
+.arte-texto .t1{font-size:11cqw;font-weight:900;color:var(--laranja);line-height:1;letter-spacing:-.02em}
+.arte-texto .t2{font-size:6.5cqw;font-weight:800;color:var(--texto);margin-top:1.5cqw}
+.arte-texto .num{position:absolute;top:6cqw;right:6cqw;font-size:4.2cqw;font-weight:900;color:#fff;background:var(--laranja);border-radius:999px;padding:.6cqw 2.4cqw}
+.arte-texto.brilho::before{ /* reflexo que passa de tempos em tempos */
+  content:"";position:absolute;top:0;bottom:0;width:30%;left:-40%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);
+  animation:reflexo 4.5s ease-in-out infinite;
+}
+@keyframes reflexo{0%,55%{left:-40%}100%{left:120%}}
+
+/* Canal de texto cinza com reflexo (estilo "Nintendo Channel") */
+.arte-gravado{display:grid;place-content:center;text-align:center;background:linear-gradient(#fff,#f1f2f3)}
+.arte-gravado .t1{
+  font-size:9.5cqw;font-weight:900;color:#a7aeb4;line-height:1.05;
+  text-shadow:0 1px 0 #fff,0 -1px 0 rgba(0,0,0,.12);
+  -webkit-box-reflect:below -.6cqw linear-gradient(transparent 35%,rgba(255,255,255,.45));
+}
+.arte-gravado .t2{font-size:4.4cqw;font-weight:800;color:var(--laranja);margin-top:12cqw;letter-spacing:.1em}
+
+/* Canais de contato: logo oficial + nome */
+.arte-rede{display:grid;place-content:center;justify-items:center;gap:2.5cqw;background:linear-gradient(#fff,#f3f5f6)}
+.arte-rede svg{width:22cqw;height:22cqw}
+.arte-rede .t2{font-size:6cqw;font-weight:900;color:var(--texto)}
+
+/* ================================================================
+   BARRA INFERIOR — compacta (curva do Wii + relógio de segmentos)
+   ================================================================ */
+.barra{position:fixed;left:0;right:0;bottom:0;height:var(--barra);z-index:20;pointer-events:none}
+.barra svg.fundo{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 -3px 8px rgba(0,0,0,.06))}
+.barra *{pointer-events:auto}
+.barra svg.fundo,.barra svg.fundo *{pointer-events:none}
+.relogio{position:absolute;left:50%;top:24px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;height:34px}
+.relogio svg{height:100%;width:auto}
+.relogio .seg{fill:var(--cinza)}
+.relogio .apagado{fill:rgba(142,151,158,.08)}
+.dois-pontos{animation:piscar 1s steps(2) infinite}
+@keyframes piscar{50%{opacity:.4}}
+.data{position:absolute;left:50%;top:66px;transform:translateX(-50%);font-size:1.1rem;font-weight:700;color:var(--cinza);letter-spacing:.5px;white-space:nowrap}
+.redondo{
+  position:absolute;top:30px;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 35%,#fff,#eef0f2 70%);border:4px solid #d3d8db;
+  box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(255,135,5,.55),0 6px 14px rgba(0,0,0,.12);
+  transition:box-shadow .25s,transform .2s;
+}
+.redondo:hover,.redondo:focus-visible{transform:scale(1.07);outline:none;box-shadow:0 0 0 2px #fff,0 0 0 6px var(--laranja),0 8px 20px rgba(229,111,0,.3)}
+.redondo.esq{left:3vw}
+.redondo.dir{right:3vw}
+.redondo .nome{font-size:.9rem;font-weight:900;color:#a3abb1;letter-spacing:.3px}
+.redondo svg{width:32px;height:32px}
+.mini-btn{
+  position:absolute;top:52px;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:#fff;border:3px solid #d3d8db;font-weight:900;color:var(--cinza);transition:.2s;
+}
+.mini-btn:hover,.mini-btn:focus-visible{border-color:var(--laranja);color:var(--laranja);outline:none}
+.mini-btn.som{left:calc(3vw + 80px)}
+.mini-btn svg{width:20px;height:20px}
+.mini-btn.solto{position:fixed;top:16px;right:16px;left:auto;z-index:101}
+.mini-btn.solto::after{bottom:auto;top:calc(100% + 10px);transform:translate(-50%,-6px)}
+.mini-btn.solto:hover::after,.mini-btn.solto:focus-visible::after{transform:translate(-50%,0)}
+
+/* Balões de dica (data-dica) — aparecem em cima, igual ao Wii */
+[data-dica]::after{
+  content:attr(data-dica);position:absolute;bottom:calc(100% + 10px);left:50%;transform:translate(-50%,6px);
+  width:max-content;max-width:230px;font-size:.8rem;font-weight:700;line-height:1.35;color:var(--texto);text-align:center;
+  background:#fff;border:3px solid var(--borda);border-radius:14px;padding:6px 12px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);opacity:0;pointer-events:none;transition:.2s;z-index:5;
+}
+[data-dica]:hover::after,[data-dica]:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+
+/* ================================================================
+   TELA DO CANAL ABERTO
+   ================================================================ */
+#zoom{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:60;overflow:hidden;transform-origin:0 0;background:#fff;pointer-events:none}
+#zoom[hidden]{display:none}
+
+#tela{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  background:repeating-linear-gradient(180deg,var(--fundo) 0 3px,var(--linha) 3px 4px);
+}
+#tela[hidden]{display:none}
+.palco{flex:1;min-height:0;display:grid;grid-template-columns:auto minmax(0,1.2fr) minmax(0,1fr) auto;gap:26px;align-items:center;padding:34px 20px 22px;width:min(1280px,100%);margin:0 auto}
+.preview{
+  position:relative;aspect-ratio:16/10;border-radius:30px;overflow:hidden;background:#fff;
+  border:6px solid #fff;box-shadow:0 0 0 3px var(--borda),0 22px 50px rgba(0,0,0,.14);
+}
+.info{
+  align-self:center;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px;justify-content:center;
+  background:#fff;border:3px solid #e3e6e8;border-radius:26px;padding:26px 26px;
+  box-shadow:0 12px 30px rgba(0,0,0,.06);
+}
+.info .selo{align-self:flex-start;font-size:.7rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--laranja-esc);background:#fff1e2;border:2px solid #ffd3a6;border-radius:999px;padding:3px 12px}
+.info h2{font-size:clamp(1.4rem,2.6vw,2.1rem);line-height:1.15;letter-spacing:-.3px}
+.info p{line-height:1.65;color:#5a636b}
+.info .email-grande{font-size:1.15rem;font-weight:900;color:var(--laranja-esc);word-break:break-all}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{font-size:.78rem;font-weight:800;color:var(--laranja-esc);background:#fff;border:2px solid #ffd3a6;border-radius:999px;padding:2px 11px}
+.progresso{height:16px;border-radius:999px;background:#eef0f2;border:2px solid #dfe3e6;overflow:hidden}
+.progresso div{height:100%;width:0;border-radius:999px;background:linear-gradient(var(--laranja-claro),var(--laranja-esc));box-shadow:inset 0 3px 0 rgba(255,255,255,.45);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.progresso-txt{font-size:.82rem;font-weight:800;color:var(--cinza);margin-bottom:4px}
+.grupos{display:grid;gap:12px}
+.grupo h3{font-size:.95rem;display:flex;align-items:center;gap:8px}
+.grupo h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--laranja)}
+.grupo small{display:block;color:var(--cinza);font-size:.8rem;margin:1px 0 7px}
+.lista-links{list-style:none;display:grid;gap:8px}
+.lista-links a{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;background:#f6f7f8;border:2px solid #eceef0;border-radius:12px;padding:9px 14px;transition:.2s}
+.lista-links a:hover{border-color:var(--laranja);color:var(--laranja-esc)}
+
+.seta{width:64px;height:110px;display:grid;place-items:center;border-radius:20px;transition:transform .2s}
+.seta svg{width:44px;height:64px;filter:drop-shadow(0 4px 6px rgba(229,111,0,.35))}
+.seta:hover,.seta:focus-visible{transform:scale(1.12);outline:none}
+.seta:hover svg{filter:drop-shadow(0 0 10px rgba(255,135,5,.8))}
+
+.barra-canal{
+  flex:none;height:128px;display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,90px);
+  background:linear-gradient(#fdfdfd,#e9ecee);border-top:4px solid var(--laranja);
+  box-shadow:0 -6px 18px rgba(0,0,0,.06);
+}
+.palco.sai-esq .preview,.palco.sai-esq .info{animation:sai-esq .22s ease-in both}
+.palco.sai-dir .preview,.palco.sai-dir .info{animation:sai-dir .22s ease-in both}
+.palco.entra-esq .preview,.palco.entra-esq .info{animation:entra-esq .32s cubic-bezier(.2,.9,.3,1.2) both}
+.palco.entra-dir .preview,.palco.entra-dir .info{animation:entra-dir .32s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes sai-esq{to{opacity:0;transform:translateX(40px)}}
+@keyframes sai-dir{to{opacity:0;transform:translateX(-40px)}}
+@keyframes entra-esq{from{opacity:0;transform:translateX(-40px)}}
+@keyframes entra-dir{from{opacity:0;transform:translateX(40px)}}
+#tela.abrindo .preview{animation:surge .45s cubic-bezier(.3,1.4,.5,1) both}
+#tela.abrindo .info{animation:surge .45s .08s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes surge{from{opacity:0;transform:scale(.94)}}
+
+/* ================================================================
+   RESPONSIVO
+   ================================================================ */
+@media (max-width:980px){
+  .fila{width:94%}
+  .grade{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:700px){
+  :root{--barra:84px}
+  .grade,.grade.tres{grid-template-columns:repeat(2,1fr);gap:10px;width:100%}
+  .grade .canal:last-child:nth-child(odd){grid-column:1/-1;aspect-ratio:16/6}
+  .canal{border-width:3px;border-radius:18px}
+  .rotulo{font-size:.68rem;left:7px;bottom:6px}
+  .fila-titulo .num{width:30px;height:30px}
+  .fila-titulo h2{font-size:1rem}
+  .relogio{top:18px;height:28px}
+  .data{top:52px;font-size:.95rem}
+  .redondo{top:24px;width:52px;height:52px;border-width:3px}
+  .redondo .nome{font-size:.72rem}
+  .redondo svg{width:26px;height:26px}
+  .mini-btn{top:40px;width:34px;height:34px}
+  .mini-btn.som{left:calc(3vw + 66px)}
+  .dica-topo{font-size:.76rem}
+  .foto-inicio{width:140px;height:140px}
+  .btn-start{height:72px;font-size:1.3rem}
+  .btn-start .dedo{right:-18px;bottom:-22px;width:50px;height:50px}
+  /* canal aberto no celular: imagem em cima, texto embaixo */
+  .palco{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:14px;padding:14px 14px 10px;position:relative}
+  .preview{border-radius:20px;border-width:4px}
+  .info{padding:18px;justify-content:flex-start;align-self:start}
+  .seta{position:absolute;top:calc(14px + (100vw - 28px) * .3125 - 40px);width:44px;height:80px;z-index:3}
+  .seta svg{width:30px;height:46px}
+  .seta.esq{left:2px}.seta.dir{right:2px}
+  .barra-canal{height:92px;gap:12px;padding:0 12px}
+  .btn-wii{min-width:0;flex:1;height:56px;font-size:1rem;padding:0 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     ✏️ EDITE [START] · TELA DE START
+     Textos: "Olá, sou…" e "Vamos começar o portfólio?" e o botão.
+     Os 3 chips embaixo mostram de relance o que existe lá dentro.
+     ================================================================ -->
+<div id="inicio" role="dialog" aria-modal="true" aria-labelledby="inicio-titulo">
+  <button class="mini-btn solto btn-som" type="button" data-dica="Som: ligado" aria-label="Ligar ou desligar o som" aria-pressed="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"></svg>
+  </button>
+
+  <div class="inicio-box">
+    <div class="foto-inicio"><img src="img/rafael.jpg" alt="Foto de Rafael Simão Carneiro" width="170" height="170"></div>
+    <p class="ola">Olá, sou <b>Rafael Simão Carneiro</b>.</p>
+    <h1 class="vamos" id="inicio-titulo">Vamos começar o <span>portfólio</span>?</h1>
+    <button class="btn-start" id="iniciar" type="button">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      Iniciar portfólio
+      <img class="dedo" src="cursors/hand.png" alt="" width="58" height="58">
+    </button>
+    <div class="trilha" aria-hidden="true">
+      <span class="passo-chip"><i>1</i>Quem sou eu</span><span class="seta-t">›</span>
+      <span class="passo-chip"><i>2</i>Meus projetos</span><span class="seta-t">›</span>
+      <span class="passo-chip"><i>3</i>Fale comigo</span>
+    </div>
+  </div>
+
+  <svg class="onda-rodape" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 70 H290 C350 70 360 100 430 100 H570 C640 100 650 70 710 70 H1000 V120 H0Z" fill="#f4f5f6"/>
+    <path d="M0 70 H290 C350 70 360 100 430 100 H570 C640 100 650 70 710 70 H1000" fill="none" stroke="#ff8705" stroke-width="4" vector-effect="non-scaling-stroke"/>
+  </svg>
+</div>
+
+<!-- ================================================================
+     MENU PRINCIPAL — 3 linhas, cada uma com um assunto
+     ================================================================ -->
+<main id="menu">
+  <div class="menu-topo">
+    <div class="marca">Rafael <span>Simão Carneiro</span><small>· Portfólio</small></div>
+    <div class="dica-topo"><img src="cursors/pointer.png" alt="" width="24" height="24">Clique em um canal para abrir</div>
+  </div>
+  <h1 class="so-leitor">Portfólio de Rafael Simão Carneiro — menu de canais</h1>
+
+  <!-- ================================================================
+       ✏️ EDITE [GRADE] — as 3 linhas do menu
+       • data-canal="id" liga o quadrado ao texto em CANAIS (no JS)
+       • Para trocar a ordem, mude os <button> de lugar
+       • Para mudar o título de uma linha, edite o <h2> e o <p>
+       • Estilos de quadrado sem foto: "arte-texto" (branco) e "arte-gravado" (cinza)
+       ================================================================ -->
+
+  <!-- LINHA 1 · QUEM SOU EU -->
+  <section class="fila" aria-labelledby="f1">
+    <header class="fila-titulo"><span class="num" aria-hidden="true">1</span><div><h2 id="f1">Quem sou eu</h2><p>Minha história, habilidades e música</p></div></header>
+    <div class="grade">
+      <button class="canal" data-canal="sobre" type="button">
+        <span class="arte arte-foto"><img src="img/rafael.jpg" alt=""></span><span class="rotulo">Sobre mim</span>
+      </button>
+      <button class="canal" data-canal="formacao" type="button" aria-label="Formação">
+        <span class="arte arte-gravado"><span class="t1">Formação</span><span class="t2">INFORMÁTICA</span></span>
+      </button>
+      <button class="canal" data-canal="skills" type="button" aria-label="Skills">
+        <span class="arte arte-texto brilho"><span class="t1">Skills</span><span class="t2">habilidades</span></span>
+      </button>
+      <button class="canal" data-canal="duo" type="button" aria-label="Duo Gêmeos">
+        <span class="arte arte-gravado"><span class="t1">Duo<br>Gêmeos</span><span class="t2">MÚSICA</span></span>
+      </button>
+      <button class="canal" data-canal="video" type="button" aria-label="Vídeo e Foto">
+        <span class="arte arte-texto"><span class="t1">Vídeo</span><span class="t2">&amp; Foto</span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- LINHA 2 · MEUS PROJETOS -->
+  <section class="fila" aria-labelledby="f2">
+    <header class="fila-titulo"><span class="num" aria-hidden="true">2</span><div><h2 id="f2">Meus projetos</h2><p>Jogos e sites que eu criei</p></div></header>
+    <div class="grade">
+      <button class="canal" data-canal="mathuni" type="button">
+        <span class="arte arte-mathuni"><img src="img/mathuni.jpg" alt=""></span><span class="adesivo">EM BREVE</span><span class="rotulo">MathUni</span>
+      </button>
+      <button class="canal" data-canal="mathfund" type="button">
+        <span class="arte"><img src="img/mathfund.jpg" alt=""></span><span class="rotulo">MathFund</span>
+      </button>
+      <button class="canal" data-canal="school" type="button" aria-label="MathFund School">
+        <span class="arte arte-texto brilho"><span class="num">1.5</span><span class="t1">MathFund</span><span class="t2">School</span></span>
+      </button>
+      <button class="canal" data-canal="cifradog" type="button">
+        <span class="arte arte-cifra"><img src="img/cifradog.jpg" alt=""><img class="logo" src="img/cifradog-logo.png" alt=""></span><span class="rotulo">Cifra-Dog</span>
+      </button>
+      <button class="canal" data-canal="mario" type="button" aria-label="Mario e DK Jr.">
+        <span class="arte arte-gravado"><span class="t1">Mario &amp;<br>DK Jr.</span><span class="t2">ESTRUTURA DE DADOS</span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- LINHA 3 · FALE COMIGO -->
+  <section class="fila" aria-labelledby="f3">
+    <header class="fila-titulo"><span class="num" aria-hidden="true">3</span><div><h2 id="f3">Fale comigo</h2><p>Escolha por onde conversar</p></div></header>
+    <div class="grade tres">
+      <button class="canal" data-canal="whatsapp" type="button" aria-label="WhatsApp">
+        <span class="arte arte-rede"><svg viewBox="0 0 24 24"><use href="#i-whats"/></svg><span class="t2">WhatsApp</span></span>
+      </button>
+      <button class="canal" data-canal="linkedin" type="button" aria-label="LinkedIn">
+        <span class="arte arte-rede"><svg viewBox="0 0 24 24"><use href="#i-linkedin"/></svg><span class="t2">LinkedIn</span></span>
+      </button>
+      <button class="canal" data-canal="github" type="button" aria-label="GitHub">
+        <span class="arte arte-rede"><svg viewBox="0 0 24 24" fill="#24292f"><use href="#i-github"/></svg><span class="t2">GitHub</span></span>
+      </button>
+    </div>
+  </section>
+</main>
+
+<!-- ================================================================
+     BARRA INFERIOR (compacta) — curva do Wii, relógio, atalhos
+     Para ficar ainda menor, diminua --barra no :root
+     ================================================================ -->
+<div class="barra">
+  <svg class="fundo" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="g-barra" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdfdfd"/><stop offset="1" stop-color="#e3e7ea"/></linearGradient></defs>
+    <path d="M0 22 H290 C350 22 360 60 430 60 H570 C640 60 650 22 710 22 H1000 V100 H0Z" fill="url(#g-barra)"/>
+    <path d="M0 22 H290 C350 22 360 60 430 60 H570 C640 60 650 22 710 22 H1000" fill="none" stroke="#ff8705" stroke-width="3" vector-effect="non-scaling-stroke"/>
+  </svg>
+
+  <button class="redondo esq" id="btn-sobre" type="button" data-dica="Sobre mim" aria-label="Sobre mim"><span class="nome">Rafael</span></button>
+  <button class="mini-btn som btn-som" type="button" data-dica="Som: ligado" aria-label="Ligar ou desligar o som" aria-pressed="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"></svg>
+  </button>
+
+  <div class="relogio" id="relogio" role="img" aria-label="Relógio"></div>
+  <div class="data" id="data"></div>
+
+  <button class="redondo dir" id="btn-contato" type="button" data-dica="Fale comigo (WhatsApp)" aria-label="Fale comigo">
+    <svg viewBox="0 0 64 48" aria-hidden="true"><rect x="4" y="4" width="56" height="40" rx="7" fill="#fff" stroke="#a3abb1" stroke-width="4"/><path d="m7 9 25 19L57 9" fill="none" stroke="#a3abb1" stroke-width="4" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<!-- ================================================================
+     CANAL ABERTO (o JS preenche com os dados de CANAIS)
+     ================================================================ -->
+<div id="tela" role="dialog" aria-modal="true" aria-labelledby="canal-titulo" hidden>
+  <div class="palco" id="palco">
+    <button class="seta esq" id="seta-esq" type="button" aria-label="Canal anterior">
+      <svg viewBox="0 0 44 64"><path d="M38 6 8 32l30 26z" fill="#ff8705" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="preview" id="preview"></div>
+    <div class="info" id="info"></div>
+    <button class="seta dir" id="seta-dir" type="button" aria-label="Próximo canal">
+      <svg viewBox="0 0 44 64"><path d="M6 6l30 26L6 58z" fill="#ff8705" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="barra-canal">
+    <button class="btn-wii" id="btn-menu" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></svg>Menu
+    </button>
+    <a class="btn-wii laranja" id="btn-iniciar" href="#" target="_blank" rel="noopener">Iniciar</a>
+  </div>
+</div>
+
+<!-- camada que faz o zoom do quadrado até a tela cheia -->
+<div id="zoom" aria-hidden="true" hidden></div>
+
+<!-- ÍCONES -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-whats" viewBox="0 0 24 24"><path fill="#25b84c" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.8-1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></symbol>
+    <symbol id="i-linkedin" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="4" fill="#2a7fc4"/><circle cx="7.5" cy="7.6" r="1.6" fill="#fff"/><rect x="6" y="10" width="3" height="8" fill="#fff"/><path d="M11 10h2.9v1.3c.5-.8 1.4-1.5 2.9-1.5 2.3 0 3.2 1.4 3.2 3.9V18h-3v-3.8c0-1.1-.3-1.9-1.4-1.9s-1.6.8-1.6 1.9V18h-3z" fill="#fff"/></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><defs><linearGradient id="g-insta" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#e1306c"/><stop offset="1" stop-color="#8a3ab9"/></linearGradient></defs><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="url(#g-insta)" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="url(#g-insta)" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.3" fill="#e1306c"/></symbol>
+    <symbol id="i-email" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="#ff8705" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="#ff8705" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<script>
+/* ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+   ┃ ✏️ EDITE [CONTATOS] — links usados no site inteiro              ┃
+   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ */
+const CONTATOS = {
+  whatsapp:  "https://wa.me/5519992844331?text=Ol%C3%A1%20Rafael!%20Vi%20seu%20portf%C3%B3lio.",
+  email:     "rolfis19@gmail.com",
+  github:    "https://github.com/rolfis-rafael",
+  linkedin:  "https://www.linkedin.com/in/rafael-simao-carneiro",
+  instagram: "https://www.instagram.com/rafaelsimao25",
+  duo:       "https://www.instagram.com/duo_gemeos"
+};
+
+/* ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+   ┃ ✏️ EDITE [SKILLS] — grupos de habilidades                       ┃
+   ┃ "onde" diz onde você usou (evita ficar genérico)                ┃
+   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ */
+const SKILLS = [
+  { nome:"Web",          onde:"MathUni, MathFund e Cifra-Dog",                  itens:["JavaScript","PHP","MySQL","HTML","CSS","Responsivo"] },
+  { nome:"Jogos",        onde:"Chefes, minigames e combate do MathUni",         itens:["Canvas 2D","Sprites","Controles touch","Game design","Otimização"] },
+  { nome:"Programação",  onde:"Trabalhos da faculdade e ferramentas próprias",  itens:["Java","Python","C","Estruturas de dados","POO / SOLID"] },
+  { nome:"Ferramentas",  onde:"Do código local até o site no ar",               itens:["Git & GitHub","XAMPP","Hospedagem web","Netlify"] },
+  { nome:"Áudio",        onde:"Produção musical e trilhas dos jogos",           itens:["Reaper","Mixagem","Produção musical","Voz e violão"] },
+  { nome:"Visual",       onde:"+6 anos editando vídeo e foto",                  itens:["Edição de vídeo","Edição de foto","Web design","Anúncios em vídeo"] }
+];
+
+/* ✏️ EDITE [MATHUNI] — porcentagem da barra (0–100) */
+const MATHUNI_PROGRESSO = 90;
+
+/* ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+   ┃ ✏️ EDITE [CANAIS] — o que aparece quando cada canal abre        ┃
+   ┃  selo   → etiqueta laranja em cima do título                    ┃
+   ┃  titulo → nome grande                                           ┃
+   ┃  texto  → descrição (pode usar <p>, <b>…)                       ┃
+   ┃  tags   → tecnologias                                           ┃
+   ┃  botao  → { texto, link }  abre um site                         ┃
+   ┃           { texto, canal } pula para outro canal                ┃
+   ┃           { texto, desativado:true } botão apagado ("em breve") ┃
+   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ */
+const CANAIS = {
+  /* ───── LINHA 1 · QUEM SOU EU ───── */
+  sobre: {
+    selo: "Quem sou eu",
+    titulo: "Rafael Simão Carneiro",
+    texto: `<p><b>Desenvolvedor web &amp; de jogos educativos · Músico.</b></p>
+            <p>Crio jogos de navegador que ensinam matemática sem parecer aula e sites completos com PHP, MySQL e JavaScript.
+            Técnico em Informática para Internet, com mais de 6 anos editando vídeo e foto e produzindo música.</p>`,
+    tags: ["Jogos educativos","Web","Música"],
+    botao: { texto: "Ver meus projetos", canal: "mathuni" }
+  },
+  formacao: {
+    selo: "Formação",
+    titulo: "Formação",
+    texto: `<p>Técnico em Informática para Internet.</p>
+            <p>Na faculdade, estudo sistemas operacionais, algoritmos, estruturas de dados e orientação a objetos, com trabalhos em Java, C e Python.</p>`, // ✏️ EDITE: curso/instituição, se quiser
+    tags: ["Java","C","Python","Algoritmos","POO / SOLID"],
+    botao: { texto: "Ver o Mario & DK Jr.", canal: "mario" }
+  },
+  skills: {
+    selo: "Inventário",
+    titulo: "Skills",
+    texto: "",            // montado sozinho a partir de SKILLS
+    tags: [],
+    botao: { texto: "Ver meus projetos", canal: "mathuni" }
+  },
+  duo: {
+    selo: "Música",
+    titulo: "Duo Gêmeos",
+    texto: `<p>Fora do código, eu faço música: tenho uma dupla musical com o meu irmão gêmeo. Acompanhe no Instagram.</p>`,
+    tags: ["Música","Dupla"],
+    botao: { texto: "Abrir Instagram", link: CONTATOS.duo }
+  },
+  video: {
+    selo: "Visual",
+    titulo: "Vídeo & Foto",
+    texto: `<p>Mais de 6 anos editando fotos e vídeos, criando conteúdo para projetos pessoais e corporativos.</p>`,
+    tags: ["Edição de vídeo","Edição de foto","Web design"],
+    botao: { texto: "Ver skills", canal: "skills" }
+  },
+
+  /* ───── LINHA 2 · MEUS PROJETOS ───── */
+  mathuni: {
+    selo: "Em breve · em desenvolvimento",
+    titulo: "MathUni",
+    texto: `<p>Meu maior projeto. Um jogo de navegador em que o aluno explora a Ilha do Farol, enfrenta chefes do folclore brasileiro
+            (Cuca, Saci, Iara, Mula…) e pratica matemática do ensino médio em minigames, sem a matéria "na cara".</p>
+            <p>Tem dificuldade adaptativa, missões, inventário, controles pensados para o polegar no celular e guia para professores alinhado à BNCC.</p>`,
+    tags: ["PHP","JavaScript","Canvas","Mobile-first","Game design"],
+    progresso: MATHUNI_PROGRESSO,
+    botao: { texto: "Em breve", desativado: true }   // ✏️ EDITE [MATHUNI]: quando lançar → { texto:"Jogar agora", link:"https://mathuni.com" }
+  },
+  mathfund: {
+    selo: "Primeira versão",
+    titulo: "MathFund",
+    texto: `<p>Onde tudo começou: o primeiro jogo de matemática no navegador, com unidades de fases numeradas, a raposa como mascote e cenário de praia.</p>
+            <p>Foi a base que evoluiu para o MathFund School e depois para o MathUni.</p>`,
+    tags: ["PHP","JavaScript","HTML/CSS"],
+    botao: { texto: "Abrir site", link: "https://mathfund.rf.gd" }
+  },
+  school: {
+    selo: "MathFund 1.5 · para escolas",
+    titulo: "MathFund School",
+    texto: `<p>Evolução do MathFund pensada para a escola: sistema de conquistas, notas, troféus e ranking, com interface renovada.</p>
+            <p>São 50 fases em 5 unidades, 99 questões e chefes nas fases 5 e 10. Roda no XAMPP, com MySQL opcional.</p>`,
+    tags: ["PHP","MySQL","JavaScript","CSS"],
+    botao: { texto: "Repositório", link: "https://github.com/rolfis-rafael/MATHFUND-School" }
+  },
+  cifradog: {
+    selo: "Plataforma web",
+    titulo: "Cifra-Dog",
+    texto: `<p>Plataforma de cifras para o público em geral: cadastro e login, perfil, adicionar músicas, busca com sugestões e avaliações das cifras.</p>`,
+    tags: ["PHP","MySQL","HTML/CSS","JavaScript"],
+    botao: { texto: "Repositório", link: "https://github.com/rolfis-rafael/Cifra-Dog" }
+  },
+  mario: {
+    selo: "Faculdade · Estrutura de Dados",
+    titulo: "Mario & DK Jr.",
+    texto: `<p>Minigame inspirado em Super Mario Bros e DK Jr., feito para o trabalho de Estrutura de Dados sobre pilha de execução,
+            usando a engine JSGE do professor David Buzatto.</p>`,
+    tags: ["Java","Pilha de execução","JSGE"],
+    botao: { texto: "Repositório", link: "https://github.com/rolfis-rafael/Mario-e-DK-Jr.-JOGO-ESTRUTURA-DE-DADOS-" }
+  },
+
+  /* ───── LINHA 3 · FALE COMIGO ───── */
+  whatsapp: {
+    selo: "Contato · o mais rápido",
+    titulo: "WhatsApp",
+    texto: `<p>Mensagem direta: o jeito mais rápido de falar comigo.</p>
+            <p>Aberto a estágio, freelas de sites e parcerias em jogos educativos ou música.</p>`, // ✏️ EDITE: o que você procura
+    tags: [],
+    botao: { texto: "Abrir WhatsApp", link: CONTATOS.whatsapp }
+  },
+  email: {
+    selo: "Contato · formal",
+    titulo: "E-mail",
+    texto: `<p>Para propostas e assuntos mais formais.</p><p class="email-grande">${CONTATOS.email}</p>`,
+    tags: [],
+    botao: { texto: "Enviar e-mail", link: "mailto:" + CONTATOS.email }
+  },
+  linkedin: {
+    selo: "Rede profissional",
+    titulo: "LinkedIn",
+    texto: `<p>Meu currículo e minhas experiências. Bora conectar!</p>`,
+    tags: [],
+    botao: { texto: "Abrir LinkedIn", link: CONTATOS.linkedin }
+  },
+  github: {
+    selo: "Código",
+    titulo: "GitHub",
+    texto: `<p>Onde fica o código dos meus projetos:</p>
+            <ul class="lista-links">
+              <li><a href="https://github.com/rolfis-rafael/MATHFUND-School" target="_blank" rel="noopener">MATHFUND-School <span>↗</span></a></li>
+              <li><a href="https://github.com/rolfis-rafael/Cifra-Dog" target="_blank" rel="noopener">Cifra-Dog <span>↗</span></a></li>
+              <li><a href="https://github.com/rolfis-rafael/Mario-e-DK-Jr.-JOGO-ESTRUTURA-DE-DADOS-" target="_blank" rel="noopener">Mario e DK Jr. <span>↗</span></a></li>
+            </ul>`,
+    tags: [],
+    botao: { texto: "Abrir GitHub", link: CONTATOS.github }
+  },
+  instagram: {
+    selo: "Perfil pessoal",
+    titulo: "Instagram",
+    texto: `<p>Meu perfil pessoal, com bastidores e música.</p>`,
+    tags: [],
+    botao: { texto: "Abrir Instagram", link: CONTATOS.instagram }
+  }
+};
+
+/* ================================================================
+   Daqui para baixo é o "motor" do menu — não precisa mexer
+   ================================================================ */
+const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = s => document.querySelector(s);
+const ORDEM = [...document.querySelectorAll(".fila [data-canal]")].map(b => b.dataset.canal);
+const doCanal = id => document.querySelector(`.fila [data-canal="${id}"]`);
+let atual = null, ocupado = false, ultimoBotao = null;
+
+// Os quadrados aparecem em sequência, quando a tela de start fecha
+document.querySelectorAll(".fila .canal").forEach((c, i) => c.style.animationDelay = (i * 0.045) + "s");
+
+/* ---------- Som (sintetizado, sem arquivos) ---------- */
+let somLigado = true, audio = null, ultimoTick = 0;
+try { somLigado = localStorage.getItem("menuSom") !== "0"; } catch(e) {}
+function som(tipo){
+  if (!somLigado) return;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === "suspended") audio.resume();
+    const t = audio.currentTime;
+    const tons = {
+      tick:   [[1800,.02,.035]],
+      abrir:  [[523,.06,.11],[784,.06,.11,.07],[1047,.1,.11,.14]],
+      voltar: [[784,.06,.1],[523,.1,.1,.07]],
+      trocar: [[880,.05,.08],[1175,.06,.07,.05]]
+    }[tipo];
+    tons.forEach(([f,d,v,atraso=0]) => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t+atraso);
+      g.gain.linearRampToValueAtTime(v, t+atraso+.01);
+      g.gain.exponentialRampToValueAtTime(.0001, t+atraso+d+.09);
+      o.connect(g).connect(audio.destination);
+      o.start(t+atraso); o.stop(t+atraso+d+.1);
+    });
+  } catch(e) {}
+}
+function atualizaSom(){
+  document.querySelectorAll(".btn-som").forEach(b => {
+    b.setAttribute("aria-pressed", somLigado);
+    b.dataset.dica = "Som: " + (somLigado ? "ligado" : "desligado");
+    b.querySelector("svg").innerHTML = somLigado
+      ? '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+      : '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="m16 9 5 6m0-6-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  });
+  try { localStorage.setItem("menuSom", somLigado ? "1" : "0"); } catch(e) {}
+}
+document.querySelectorAll(".btn-som").forEach(b => b.addEventListener("click", e => {
+  e.stopPropagation(); somLigado = !somLigado; atualizaSom(); som("trocar");
+}));
+atualizaSom();
+document.addEventListener("pointerover", e => {
+  const alvo = e.target.closest("button,a");
+  if (!alvo || alvo.contains(e.relatedTarget)) return;
+  const agora = performance.now();
+  if (agora - ultimoTick > 70) { ultimoTick = agora; som("tick"); }
+});
+
+/* ---------- Tela de start ---------- */
+$("#menu").setAttribute("inert",""); $(".barra").setAttribute("inert","");
+$("#iniciar").focus();
+$("#iniciar").addEventListener("click", () => {
+  som("abrir");
+  $("#inicio").classList.add("sumir");
+  document.body.classList.add("pronto");
+  $("#menu").removeAttribute("inert"); $(".barra").removeAttribute("inert");
+  setTimeout(() => { $("#inicio").hidden = true; }, 700);
+  setTimeout(() => document.querySelector(".fila .canal").focus({ preventScroll:true }), 500);
+});
+
+/* ---------- Relógio de segmentos (como o do Wii) ---------- */
+const SEGS = { a:"8,2,24,5", b:"33,8,5,25", c:"33,37,5,25", d:"8,63,24,5", e:"2,37,5,25", f:"2,8,5,25", g:"8,32.5,24,5" };
+const DIG = ["abcdef","bc","abdeg","abcdg","bcfg","acdfg","acdefg","abc","abcdefg","abcdfg"];
+function digito(n){
+  return '<svg viewBox="0 0 40 70" aria-hidden="true">' + Object.entries(SEGS).map(([s,r]) => {
+    const [x,y,w,h] = r.split(",");
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2.5" class="${DIG[n].includes(s) ? "seg" : "apagado"}"/>`;
+  }).join("") + "</svg>";
+}
+function relogio(){
+  const d = new Date(), hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
+  $("#relogio").innerHTML = digito(+hh[0]) + digito(+hh[1]) +
+    '<svg viewBox="0 0 14 70" class="dois-pontos" aria-hidden="true"><circle cx="7" cy="24" r="4" class="seg"/><circle cx="7" cy="48" r="4" class="seg"/></svg>' +
+    digito(+mm[0]) + digito(+mm[1]);
+  $("#relogio").setAttribute("aria-label", "Agora são " + hh + ":" + mm);
+  const dias = ["dom","seg","ter","qua","qui","sex","sáb"];
+  $("#data").textContent = dias[d.getDay()] + " " + d.getDate() + "/" + (d.getMonth()+1);
+}
+relogio(); setInterval(relogio, 10000);
+
+/* ---------- Monta o texto do canal Skills a partir de SKILLS ---------- */
+CANAIS.skills.texto = '<div class="grupos">' + SKILLS.map(g =>
+  `<div class="grupo"><h3>${g.nome}</h3><small>${g.onde}</small><div class="tags">${g.itens.map(i => `<span class="tag">${i}</span>`).join("")}</div></div>`
+).join("") + "</div>";
+
+/* ---------- Monta o conteúdo de um canal ---------- */
+function preencher(id){
+  const c = CANAIS[id], botao = doCanal(id);
+  atual = id;
+  // a arte do quadrado vira a "prévia" grande do canal
+  $("#preview").innerHTML = "";
+  $("#preview").appendChild(botao.querySelector(".arte").cloneNode(true));
+  const adesivo = botao.querySelector(".adesivo");
+  if (adesivo) $("#preview").appendChild(adesivo.cloneNode(true));
+
+  $("#info").innerHTML =
+    `<span class="selo">${c.selo}</span>
+     <h2 id="canal-titulo">${c.titulo}</h2>
+     ${c.texto}
+     ${c.progresso != null ? `<div><div class="progresso-txt">Desenvolvimento: ${c.progresso}%</div><div class="progresso"><div></div></div></div>` : ""}
+     ${c.tags.length ? `<div class="tags">${c.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>` : ""}`;
+  if (c.progresso != null) setTimeout(() => { const b = $("#info .progresso div"); if (b) b.style.width = c.progresso + "%"; }, 150);
+  $("#info").scrollTop = 0;
+
+  // botão "Iniciar" (muda conforme o canal)
+  const ini = $("#btn-iniciar");
+  ini.textContent = c.botao.texto;
+  ini.removeAttribute("aria-disabled"); ini.removeAttribute("data-canal-destino");
+  ini.setAttribute("target","_blank");
+  if (c.botao.desativado) { ini.setAttribute("aria-disabled","true"); ini.href = "#"; }
+  else if (c.botao.canal) { ini.dataset.canalDestino = c.botao.canal; ini.href = "#"; ini.removeAttribute("target"); }
+  else {
+    ini.href = c.botao.link;
+    if (c.botao.link.startsWith("mailto:")) ini.removeAttribute("target");
+  }
+}
+
+/* ---------- Abrir / fechar com zoom do quadrado (assinatura do Wii) ---------- */
+function retangulo(id){ return doCanal(id).getBoundingClientRect(); }
+function transformDe(r){ return `translate(${r.left}px,${r.top}px) scale(${r.width/innerWidth},${r.height/innerHeight})`; }
+
+function abrirCanal(id){
+  if (ocupado) return;
+  ocupado = true; som("abrir");
+  ultimoBotao = doCanal(id);
+  preencher(id);
+  const zoom = $("#zoom");
+  zoom.innerHTML = ""; zoom.appendChild(ultimoBotao.querySelector(".arte").cloneNode(true));
+  $("#menu").setAttribute("inert",""); $(".barra").setAttribute("inert","");
+  const mostrar = () => {
+    $("#tela").hidden = false; $("#tela").classList.add("abrindo");
+    setTimeout(() => $("#tela").classList.remove("abrindo"), 600);
+    $("#btn-menu").focus({ preventScroll:true });
+  };
+  if (reduz) { mostrar(); ocupado = false; return; }
+  zoom.hidden = false;
+  const r = retangulo(id);
+  zoom.animate([{ transform: transformDe(r), borderRadius:"22px" }, { transform:"none", borderRadius:"0" }],
+               { duration: 430, easing: "cubic-bezier(.6,0,.2,1)" }).onfinish = () => {
+    mostrar();
+    zoom.animate([{ opacity:1 }, { opacity:0 }], { duration: 260, easing:"ease-out" }).onfinish = () => { zoom.hidden = true; ocupado = false; };
+  };
+}
+function fecharCanal(){
+  if (ocupado || $("#tela").hidden) return;
+  ocupado = true; som("voltar");
+  const id = atual, zoom = $("#zoom");
+  const terminar = () => {
+    $("#menu").removeAttribute("inert"); $(".barra").removeAttribute("inert");
+    (doCanal(id) || ultimoBotao).focus({ preventScroll:true });
+    ocupado = false;
+  };
+  $("#tela").hidden = true;
+  if (reduz) { terminar(); return; }
+  zoom.innerHTML = ""; zoom.appendChild(doCanal(id).querySelector(".arte").cloneNode(true));
+  zoom.hidden = false;
+  const r = retangulo(id);
+  zoom.animate([{ transform:"none", borderRadius:"0", opacity:1 }, { transform: transformDe(r), borderRadius:"22px", opacity:1 }],
+               { duration: 380, easing: "cubic-bezier(.6,0,.2,1)" }).onfinish = () => { zoom.hidden = true; terminar(); };
+}
+
+/* ---------- Trocar de canal pelas setas ---------- */
+function trocar(direcao){
+  if (ocupado) return;
+  const i = ORDEM.indexOf(atual), prox = ORDEM[(i + direcao + ORDEM.length) % ORDEM.length];
+  irPara(prox, direcao);
+}
+function irPara(id, direcao = 1){
+  if (ocupado || id === atual) return;
+  som("trocar");
+  const palco = $("#palco");
+  if (reduz) { preencher(id); return; }
+  ocupado = true;
+  palco.className = "palco " + (direcao > 0 ? "sai-dir" : "sai-esq");
+  setTimeout(() => {
+    preencher(id);
+    palco.className = "palco " + (direcao > 0 ? "entra-dir" : "entra-esq");
+    setTimeout(() => { palco.className = "palco"; ocupado = false; }, 340);
+  }, 220);
+}
+
+/* ---------- Ligações ---------- */
+document.querySelectorAll(".fila [data-canal]").forEach(b => b.addEventListener("click", () => abrirCanal(b.dataset.canal)));
+$("#btn-sobre").addEventListener("click", () => abrirCanal("sobre"));
+$("#btn-contato").addEventListener("click", () => abrirCanal("whatsapp"));
+$("#btn-menu").addEventListener("click", fecharCanal);
+$("#seta-esq").addEventListener("click", () => trocar(-1));
+$("#seta-dir").addEventListener("click", () => trocar(1));
+$("#btn-iniciar").addEventListener("click", e => {
+  const ini = e.currentTarget;
+  if (ini.getAttribute("aria-disabled") === "true") { e.preventDefault(); return; }
+  if (ini.dataset.canalDestino) { e.preventDefault(); const destino = ini.dataset.canalDestino; irPara(destino, ORDEM.indexOf(destino) > ORDEM.indexOf(atual) ? 1 : -1); }
+  else som("abrir");
+});
+
+// Teclado: Esc volta · ← → trocam de canal · Tab fica dentro do canal aberto
+document.addEventListener("keydown", e => {
+  if ($("#tela").hidden) return;
+  if (e.key === "Escape") { e.preventDefault(); fecharCanal(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); trocar(1); }
+  else if (e.key === "ArrowLeft")  { e.preventDefault(); trocar(-1); }
+  else if (e.key === "Tab") {
+    const foc = [...$("#tela").querySelectorAll("button,a[href]")].filter(el => el.offsetParent !== null);
+    const a = foc[0], z = foc[foc.length-1];
+    if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+    else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+  }
+});
+</script>
+</body>
+</html>
